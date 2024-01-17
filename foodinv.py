@@ -40,10 +40,12 @@ import webbrowser
 import time
 from pretty_html_table import build_table
 from sqlalchemy import create_engine
-import iquirer
+import inquirer
 
 
-
+# ==============================================================================
+# establish database connection
+# ==============================================================================
 
 XUSER       = 'jfsharron'
 XWORD       = 'marie151414'
@@ -51,10 +53,6 @@ HOST        = '192.168.2.107'
 DATABASE    = 'foodinv'
 DATAFILE    = '//192.168.2.102/share'
 
-#print(USER)
-
-# establish database connection
-# =============================
 try:
     CONNECTION = mysql.connector.connect(user=XUSER, password=XWORD,
     host=HOST, database=DATABASE)
@@ -70,22 +68,18 @@ except Error as e:
     print("Error while connecting to MySQL", e)
 
 # ==============================================================================
-# user functions
+# intialize lists and variables
 # ==============================================================================    
 
+type_list = []
+weight_unit_list = []
+sub_type_list = []
 
 
 
-
-
-
-
-
-
-
-
-
-
+# ==============================================================================
+# user functions
+# ==============================================================================    
 
 def menu():
     """
@@ -106,7 +100,7 @@ def menu():
         # --------------
         now = datetime.datetime.now()
         print(Fore.GREEN + now.strftime("%Y-%m-%d %H:%M:%S").rjust(80))
-        print(("isbn-22 ").rjust(80))
+        print(("foodinv").rjust(80))
         print("-----------------------".rjust(80))
         print(Style.RESET_ALL)
         print('')
@@ -129,7 +123,7 @@ def menu():
         menuOption = input("selection: ")
 
         if menuOption == '1':
-            inputNew()
+            get_selections()
         elif menuOption == '2':
             programFunctMenu()
         elif menuOption == '3':
@@ -141,43 +135,215 @@ def menu():
 
 """
 ============================================================================
-Function:       inputNew()
+Function:       get_selections()
 Purpose:        allows entry of a new record into database
 Parameter(s):   -None-
 Return:         users desired action
 ============================================================================
 """
-def inputNew():
+def get_selections():
+
     current_date    = str(datetime.datetime.now())
+
+    global code_no
+    # ==========================================================================
+    # get intial code_no
+    # ==========================================================================
+    mysql_select_query = ("SELECT value FROM xcounter WHERE counter_id = 1")
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query) 
+    code_no = cursor.fetchone()
+    code_no = str(code_no)
+    code_no = code_no.strip(",()'")
+    # ==========================================================================
+
+
+    # ==========================================================================
+    # type selection
+    # ==========================================================================    
+    
+    mysql_select_query = ("SELECT type FROM type")
+
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query)    
+    rows = cursor.fetchall()
+    for row in rows:
+        row = str(row)
+        row = row.strip(",()'")
+        type_list.append(row)
+
+    print('')
     questions = [
-        inquirer.List()
+      inquirer.List('ptype',
+                    message="What is the type?",
+                    choices=type_list,
+                    ),
     ]
+    answers = inquirer.prompt(questions)
+    global ptype 
+    ptype = str(answers["ptype"])
+    ptype = ptype.strip(",()'")
 
+    # ==========================================================================
+    # retrieve type_prefix
+    # ==========================================================================
+    
+    qptype = ("'" + ptype + "'")
+    mysql_select_query = ("SELECT type_prefix FROM type WHERE type = " + qptype)
 
-    #type            = input("Enter food type (required): ")
-    #sub_type        = input("Enter food sub type (required): ")
-    #description     = input("Enter description (optional): ")
-    #net_weight      = input("Enter net weight (required): ")
-    #weight_unit     = input("Enter the weight unit of measure: ") or "pounds"
-    #pieces          = input("Enter number of pieces (required): ")
-    #date_packaged   = input("Enter date packaged (required): ") or \
-    #                        current_date
-    #code            = input("Enter code: ")
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query) 
+    global type_prefix
+    type_prefix = cursor.fetchone()
+    type_prefix = str(type_prefix)
+    type_prefix = type_prefix.strip(",()'")
+
+# ==============================================================================
+# sub_type selection
+# ==============================================================================
+
+    mysql_select_query = ("SELECT type FROM chicken_sub")
+
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query)    
+    rows = cursor.fetchall()
+    for row in rows:
+        row = str(row)
+        row = row.strip(",()'")
+        sub_type_list.append(row)
+
+    questions = [
+      inquirer.List('sub_type',
+                    message="What is the sub_type?",
+                    choices=sub_type_list,
+                    ),
+    ]
+    answers = inquirer.prompt(questions)
+    global sub_type 
+    sub_type = str(answers["sub_type"])
+    sub_type = sub_type.strip(",()'")
+
+    # ==========================================================================
+    # enter (optional) description
+    # ==========================================================================
+
+    global description
+    description = input("enter (optional) description: ")
+
+    # ==========================================================================
+    # enter weight 
+    # ==========================================================================
 
     print('')
+    global weight
+    weight= input("enter net weight: ")
+    
+    # ==========================================================================
+    # weight_unit selection
+    # ==========================================================================
+    
+    mysql_select_query = ("SELECT weight_unit FROM weight_unit_sub")
+
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query)    
+    rows = cursor.fetchall()
+    for row in rows:
+        row = str(row)
+        row = row.strip(",()'")
+        weight_unit_list.append(row)
+
     print('')
+    questions = [
+      inquirer.List('weight_unit',
+                    message="What is the weight unit?",
+                    choices=weight_unit_list,
+                    ),
+    ]
+    answers = inquirer.prompt(questions)
+    global weight_unit  
+    weight_unit = str(answers["weight_unit"])
+    weight_unit = weight_unit.strip(",()'")
+
+    # ==========================================================================
+    # enter piece count
+    # ==========================================================================
+    
+    global piece
+    piece= input("enter number of pieces: ")
+
+    # ==========================================================================
+    # enter date 
+    # ==========================================================================
+
+    current_date = datetime.date.today()
+
+    global pack_date
+    print('')
+    pack_date = input("enter date packaged (YYYY-MM-DD) or press enter for" + \
+                       " current date: ") or current_date
+    pack_date = str(pack_date)
     print('')
 
-    print("type: " + type)
+    # ==========================================================================
+    # calculate code 
+    # ==========================================================================
+
+    global qcode
+    qcode = (type_prefix + code_no)
+    code_no = int(code_no)
+    code_no += 1
+
+    # ==========================================================================
+    # process selections
+    # ==========================================================================
+
+    ver_pro()
+
+
+"""
+============================================================================
+Function:       ver_pro()
+Purpose:        allows user to verify input and proceed
+Parameter(s):   values from get_selections()
+Return:         users desired action
+============================================================================
+"""
+def ver_pro():
+
+    print("These are your values, are the correct?")
+    print('')
+    print("type: " + ptype)
+    print("type_prefix: " + type_prefix)
     print("sub_type: " + sub_type)
     print("description: " + description)
-    print("net_weight: " + net_weight )
+    print("weight: " + weight)
     print("weight_unit: " + weight_unit)
-    print("pieces: " + pieces)
-    print("date_packaged: " + date_packaged)
-    print("code: " + code)        
+    print("pieces: " + piece)
+    print("pack_date: " + pack_date)
+    print("qcode: " + qcode) 
+    print('')  
+    print(Fore.YELLOW + "Select 1 to save and return or pree enter")
+    print("Select 2 to NOT save and return")
+    print("Select 3 to save and go to the main menu")
+    print("Select 4 to NOT save and return to the main menu")
+    print(Style.RESET_ALL)
+    print("")
+    verify = input("Selection: ") or 1
+
+    if verify == '1':
+        sysParmMenu()
+    elif verify == '2':
+        get_selections()
+    elif verify == '3':
+        newReport() 
+    elif verify == '4':  
+        menu()
 
 
+
+    
+    
+    
 
 
 
@@ -198,12 +364,23 @@ def main():
     ============================================================================
     """
     global CONNECTION
-    #preProcess()
-    #createLists()
-    #getInfo()
-    #getGenre()
-    #exportLists()
+
     menu()
+
+    #print('')
+    #print('')
+    #print('')
+    #print("type: " + ptype)
+    #print("type_prefix: " + type_prefix)
+    #print("sub_type: " + sub_type)
+    #print("description: " + description)
+    #print("weight: " + weight)
+    #print("weight_unit: " + weight_unit)
+    #print("pieces: " + piece)
+    #print("pack_date: " + pack_date)
+    #print("qcode: " + qcode) 
+    #print('')
+    #print('')   
 
     print("Closing Database Connection . . .")
     CONNECTION.close()
