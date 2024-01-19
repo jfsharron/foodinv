@@ -133,16 +133,15 @@ def menu():
 
         os.system('cls')   
 
-"""
-============================================================================
-Function:       get_selections()
-Purpose:        allows entry of a new record into database
-Parameter(s):   -None-
-Return:         users desired action
-============================================================================
-"""
 def get_selections():
-
+    """
+    ============================================================================
+    Function:       get_selections()
+    Purpose:        allows entry of a new record into database
+    Parameter(s):   -None-
+    Return:         users desired action
+    ============================================================================
+    """
     current_date    = str(datetime.datetime.now())
 
     global code_no
@@ -155,6 +154,8 @@ def get_selections():
     code_no = cursor.fetchone()
     code_no = str(code_no)
     code_no = code_no.strip(",()'")
+    global init_code_no
+    init_code_no = code_no
     # ==========================================================================
 
 
@@ -198,9 +199,9 @@ def get_selections():
     type_prefix = str(type_prefix)
     type_prefix = type_prefix.strip(",()'")
 
-# ==============================================================================
-# sub_type selection
-# ==============================================================================
+    # ==========================================================================
+    # sub_type selection
+    # ==========================================================================
 
     mysql_select_query = ("SELECT type FROM chicken_sub")
 
@@ -299,17 +300,15 @@ def get_selections():
 
     ver_pro()
 
-
-"""
-============================================================================
-Function:       ver_pro()
-Purpose:        allows user to verify input and proceed
-Parameter(s):   values from get_selections()
-Return:         users desired action
-============================================================================
-"""
 def ver_pro():
-
+    """
+    ============================================================================
+    Function:       ver_pro()
+    Purpose:        allows user to verify input and proceed
+    Parameter(s):   values from get_selections()
+    Return:         users desired action
+    ============================================================================
+    """
     print("These are your values, are the correct?")
     print('')
     print("type: " + ptype)
@@ -322,7 +321,7 @@ def ver_pro():
     print("pack_date: " + pack_date)
     print("qcode: " + qcode) 
     print('')  
-    print(Fore.YELLOW + "Select 1 to save and return or pree enter")
+    print(Fore.YELLOW + "Select 1 to save and return or press enter")
     print("Select 2 to NOT save and return")
     print("Select 3 to save and go to the main menu")
     print("Select 4 to NOT save and return to the main menu")
@@ -331,19 +330,74 @@ def ver_pro():
     verify = input("Selection: ") or 1
 
     if verify == '1':
-        sysParmMenu()
+        savereturn_query()
     elif verify == '2':
         get_selections()
     elif verify == '3':
-        newReport() 
+        save_query() 
     elif verify == '4':  
         menu()
+    
+def save_query():
+    """
+    ============================================================================
+    Function:       save_query()
+    Purpose:        write data to MYSQL
+    Parameter(s):   values from ver_pro()
+    Return:         data written to MYSQL foodinv and return to main menu
+    ============================================================================
+    """ 
+
+    data = (ptype, sub_type, description, weight, weight_unit, piece, pack_date,\
+            qcode, 0)
+    save_query = ("INSERT INTO inv (type, sub_type, description, net_weight, \
+                  weight_unit, pieces, date_packaged, code, discard)"
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+
+    cursor = CONNECTION.cursor()
+    cursor.execute(save_query, data)
+    CONNECTION.commit()      
+
+    up_data = (code_no, 1)
+    code_update_query = ("UPDATE xcounter SET value = (%s) WHERE \
+                         counter_id = (%s)")
+    cursor = CONNECTION.cursor()
+    cursor.execute(code_update_query, up_data)
+    CONNECTION.commit() 
 
 
+def savereturn_query():
+    """
+    ============================================================================
+    Function:       savereturn_query()
+    Purpose:        write data to MYSQL
+    Parameter(s):   values from ver_pro()
+    Return:         data written to MYSQL foodinv and return to input menu
+    ============================================================================
+    """ 
+
+    data = (ptype, sub_type, description, weight, weight_unit, piece, pack_date,\
+            qcode, 0)
+    save_query = ("INSERT INTO inv (type, sub_type, description, net_weight, \
+                  weight_unit, pieces, date_packaged, code, discard)"
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+
+    cursor = CONNECTION.cursor()
+    cursor.execute(save_query, data)
+    CONNECTION.commit()
+
+    up_data = (code_no, 1)
+    code_update_query = ("UPDATE xcounter SET value = (%s) WHERE \
+                         counter_id = (%s)")
+    cursor = CONNECTION.cursor()
+    cursor.execute(code_update_query, up_data)
+    CONNECTION.commit()       
+    
+    get_selections()
 
     
     
-    
+
 
 
 
@@ -366,6 +420,9 @@ def main():
     global CONNECTION
 
     menu()
+
+    print("init_code_no: " + str(init_code_no))
+    print("code_no: " + str(code_no))
 
     #print('')
     #print('')
