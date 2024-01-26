@@ -103,6 +103,24 @@ UPDATE type SET type_prefix ='se' WHERE type_id = 4;
 --01/17/2022 modify table type to set code prefix NOT NULL AND UNIQUE
 ALTER TABLE type MODIFY type_prefix CHAR(2) NOT NULL UNIQUE;
 
+--changeset jfs:9
+--01/22/2022 modify table xcounter to include field sht_name
+ALTER TABLE xcounter ADD COLUMN sht_name VARCHAR(10) AFTER value;
+
+--changeset jfs:10
+--01/22/2022 add intial sht_name value to xcounter
+UPDATE xcounter SET sht_name = 'ch9999' WHERE counter_id = 1;
+
+--changeset jfs:11
+--01/22/2022 alter so sht_name field is NOT NULL
+ALTER TABLE xcounter MODIFY sht_name VARCHAR(10) NOT NULL;
+
+--changeset jfs:12
+--01/22/2022 alter so sht_name field to correct lenghth
+ALTER TABLE xcounter MODIFY sht_name VARCHAR(25) NOT NULL;
+
+
+
 
 
 

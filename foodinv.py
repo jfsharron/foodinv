@@ -13,6 +13,8 @@ import sys
 import re
 import pandas as pd
 import openpyxl
+from openpyxl import load_workbook
+from openpyxl import Workbook
 import mysql.connector
 from mysql.connector import Error
 import functools
@@ -41,6 +43,7 @@ import time
 from pretty_html_table import build_table
 from sqlalchemy import create_engine
 import inquirer
+from copy import copy
 
 
 # ==============================================================================
@@ -71,9 +74,12 @@ except Error as e:
 # intialize lists and variables
 # ==============================================================================    
 
-type_list = []
-weight_unit_list = []
-sub_type_list = []
+type_list           = []
+weight_unit_list    = []
+sub_type_list       = []
+LABELFILE           = '/data/share/foodinv/food_label.xlsx'
+RUN_ONCE            = 1
+
 
 
 
@@ -365,6 +371,7 @@ def save_query():
     cursor.execute(code_update_query, up_data)
     CONNECTION.commit() 
 
+    spreadsheet(qcode)    
 
 def savereturn_query():
     """
@@ -391,18 +398,86 @@ def savereturn_query():
                          counter_id = (%s)")
     cursor = CONNECTION.cursor()
     cursor.execute(code_update_query, up_data)
-    CONNECTION.commit()       
+    CONNECTION.commit()  
+
+    spreadsheet(qcode)     
     
     get_selections()
 
+def spreadsheet(qcode):
+    """
+    ============================================================================
+    Function:       spreadsheet(qcode)
+    Purpose:        send records to spreadsheet for label printing
+    Parameter(s):   values from save queries
+    Return:         data sent to LABELFILE 
+    ============================================================================
+    """
+    ## ==========================================================================
+    ## create new worksheet and input data
+    ## ==========================================================================
     
+    global RUN_ONCE
+    if RUN_ONCE == 1:
+
+        # ======================================================================
+        # create new worksheet
+        # ======================================================================
+        current_date = str(datetime.date.today())
+        sht_name = (current_date + "  " + str(init_code_no))
+
+        workbook = load_workbook(LABELFILE)
+        source_ws_name = 'template'
+        target_ws_name = sht_name
+        source_ws = workbook[source_ws_name]
+        target_ws = copy(source_ws)
+        target_ws.title = target_ws_name
+        workbook._add_sheet(target_ws)
+
+        workbook.save(LABELFILE)
+
+        up_data = (sht_name, 1)
+        sht_update_query = ("UPDATE xcounter SET sht_name = (%s) WHERE \
+                             counter_id = (%s)")
+        cursor = CONNECTION.cursor()
+        cursor.execute(sht_update_query, up_data)
+        CONNECTION.commit()
+
+        RUN_ONCE = 0
+    # ======================================================================
+    # input data
+    # ======================================================================
     
+    append_q = ("'" + qcode + "'")
 
+    mysql_select_query = ("SELECT sht_name FROM xcounter WHERE counter_id = 1")
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query) 
+    sht_name = cursor.fetchone()
+    sht_name = str(sht_name)
+    sht_name = sht_name.strip(",()'")
 
+    df = sql.read_sql(("SELECT * FROM inv WHERE code = " + append_q), \
+                       CONNECTION)
 
+    # Load the existing workbook
+    workbook_path = LABELFILE
+    workbook = load_workbook(workbook_path)
 
+    # Get the target worksheet
+    target_ws_name = sht_name 
+    target_ws = workbook[target_ws_name]
 
+    # Get the maximum row number in the target worksheet
+    max_row = target_ws.max_row + 1
 
+    # Write the new row of data to the worksheet
+    for index, row in df.iterrows():
+        for col_num, value in enumerate(row, start=1):
+            target_ws.cell(row=max_row, column=col_num, value=value)
+
+    # Save the modified workbook
+    workbook.save(workbook_path)
 
 # ==============================================================================
 #  main entry point for program
