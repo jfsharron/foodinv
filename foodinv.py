@@ -114,7 +114,7 @@ def menu():
         print(Fore.GREEN + '-------------------')
         print(Style.RESET_ALL)
         print('1\tINPUT NEW RECORD')
-        print('2\tProgram Functions')
+        print('2\tDISCARD MENU')
         print('3\tReports')
         print('')
         print('')
@@ -131,7 +131,7 @@ def menu():
         if menuOption == '1':
             get_selections()
         elif menuOption == '2':
-            programFunctMenu()
+            discard()
         elif menuOption == '3':
             newReport() 
         elif menuOption == '0':    
@@ -479,6 +479,137 @@ def spreadsheet(qcode):
     # Save the modified workbook
     workbook.save(workbook_path)
 
+def discard():
+    """
+    ============================================================================
+    Function:       discard()
+    Purpose:        mark discard field in database file as TRUE for used product
+    Parameter(s):   -None-
+    Return:         changes field in MYSQL database
+    ============================================================================
+    """    
+    # ==========================================================================
+    # discard menu
+    # ==========================================================================
+   
+    os.system('cls')
+    # main menu
+    #----------
+    #goAgain2 = 1
+#
+    #while goAgain2 == 1:
+        # format screen
+        # --------------
+    now = datetime.datetime.now()
+    print(Fore.GREEN + now.strftime("%Y-%m-%d %H:%M:%S").rjust(80))
+    print(("foodinv").rjust(80))
+    print("-----------------------".rjust(80))
+    print(Style.RESET_ALL)
+    print('')
+    print(Fore.GREEN + 'DISCARD MENU')
+    print(Fore.GREEN + '-------------------')
+    print(Style.RESET_ALL)
+        #print('1\tMANUAL INPUT')
+        #print('2\tBATCH INPUT')
+        #print('')
+        #print('')
+        #print('')
+        #print(Style.RESET_ALL)
+        #print('')
+        #print('')      
+#
+        #discardOption =
+
+    discardList = ["manually", "batch"]
+
+    questions = [
+      inquirer.List('discardSel',
+                    message="How do you want to enter data?",
+                    choices = discardList,
+                    ),
+    ]
+
+    answers = inquirer.prompt(questions)
+    discardOption = str(answers["discardSel"])
+
+    # ==========================================================================
+    # discard operation
+    # ==========================================================================
+
+    if discardOption == 'manually':
+        ent_code = input("Please enter the qcode you wish to mark as discard: ")
+        print("selection was manually")
+
+        append_q = ("'" + ent_code + "'")
+        append_q =str(append_q)
+
+        mysql_select_query = ("SELECT * FROM inv WHERE code = " + append_q)
+        cursor = CONNECTION.cursor(buffered = True)
+        cursor.execute(mysql_select_query) 
+        sel_res = cursor.fetchone()
+
+        if sel_res == None:
+            programPause = input("Record not found, press the <ENTER> "
+                                 "key to continue...")
+
+        else:
+            sql_up_query = ("""UPDATE inv SET discard = 1 WHERE code = """ \
+                             + append_q)
+            cursor.execute(sql_up_query)
+            CONNECTION.commit()
+
+    elif discardOption == 'batch':
+
+        good_list = []
+        bad_list = []
+
+        data = pd.read_excel(LABELFILE, sheet_name = 'discard', usecols = \
+                             ['code'])
+
+        # Load the workbook
+        workbook = openpyxl.load_workbook(LABELFILE)
+        sheet = workbook['discard']
+        col_index = 1  
+
+        # Retrieve all string values and store in a list
+        column_values_list = [str(sheet.cell(row=i, column=col_index).value) \
+                              for i in range(2, sheet.max_row + 1)]
+
+        # Check data for erroneous input values
+        for value in column_values_list :
+            value = ("'" + value + "'")
+            mysql_select_query = ("SELECT * FROM inv WHERE code = " + value)
+            cursor = CONNECTION.cursor(buffered = True)
+            cursor.execute(mysql_select_query) 
+            sel_res = cursor.fetchone()
+
+            if sel_res is None:
+                bad_list.append(value)
+            else:
+                good_list.append(value)
+
+            # Update database
+            for i in good_list:
+                sql_up_query = ("""UPDATE inv SET discard = 1 WHERE code = """ \
+                                 + i)
+                cursor.execute(sql_up_query)
+                CONNECTION.commit()    
+            
+        # Print update messages
+        print("Data Updated!") 
+        if len(bad_list) > 0:
+            print("These values were not found in the database")
+            print(bad_list)
+        print('')
+
+
+          
+
+    
+
+        
+
+
 # ==============================================================================
 #  main entry point for program
 #  =============================================================================    
@@ -498,21 +629,6 @@ def main():
 
     print("init_code_no: " + str(init_code_no))
     print("code_no: " + str(code_no))
-
-    #print('')
-    #print('')
-    #print('')
-    #print("type: " + ptype)
-    #print("type_prefix: " + type_prefix)
-    #print("sub_type: " + sub_type)
-    #print("description: " + description)
-    #print("weight: " + weight)
-    #print("weight_unit: " + weight_unit)
-    #print("pieces: " + piece)
-    #print("pack_date: " + pack_date)
-    #print("qcode: " + qcode) 
-    #print('')
-    #print('')   
 
     print("Closing Database Connection . . .")
     CONNECTION.close()
