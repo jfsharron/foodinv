@@ -119,6 +119,48 @@ ALTER TABLE xcounter MODIFY sht_name VARCHAR(10) NOT NULL;
 --01/22/2022 alter so sht_name field to correct lenghth
 ALTER TABLE xcounter MODIFY sht_name VARCHAR(25) NOT NULL;
 
+--changeset jfs:13
+--02/05/2024
+--note previous changestes should be date 2024
+CREATE TABLE IF NOT EXISTS `foodinv`.`seafood_sub` (
+    `seafood_sub_id` INT NOT NULL AUTO_INCREMENT,
+    `type` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`seafood_sub_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+INSERT INTO seafood_sub(type) VALUES ('clam');
+INSERT INTO seafood_sub(type) VALUES ('oyster');
+INSERT INTO seafood_sub(type) VALUES ('scallop');
+INSERT INTO seafood_sub(type) VALUES ('shrimp');
+INSERT INTO seafood_sub(type) VALUES ('crab');
+INSERT INTO seafood_sub(type) VALUES ('fish-cod');
+INSERT INTO seafood_sub(type) VALUES ('fish-halibut');
+
+--changeset jfs:14
+--02/05/2024 add other to type table
+INSERT INTO type(type, type_prefix) VALUES ('other', 'ot');
+
+--changeset jfs:15
+--02/05/2024 create other_sub table and add intial values in database
+CREATE TABLE IF NOT EXISTS `foodinv`.`other_sub` (
+    `other_sub_id` INT NOT NULL AUTO_INCREMENT,
+    `type` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`other_sub_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+INSERT INTO other_sub(type) VALUES ('ground');
+INSERT INTO other_sub(type) VALUES ('soup');
+
+
+
+
+
+
+
+
+
 
 
 

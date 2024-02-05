@@ -500,10 +500,13 @@ def get_selections():
 
     # sub_type selection
     # -------------------
-    mysql_select_query = ("SELECT type FROM chicken_sub")
+    sub_type_list = []
+    sub = (ptype + "_sub")
+    print(sub)
+    mysql_select_sub_query = ("SELECT type FROM " + sub)
 
     cursor = CONNECTION.cursor(buffered = True)
-    cursor.execute(mysql_select_query)    
+    cursor.execute(mysql_select_sub_query)    
     rows = cursor.fetchall()
     for row in rows:
         row = str(row)
