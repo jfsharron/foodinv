@@ -153,6 +153,45 @@ DEFAULT CHARACTER SET = utf8mb3;
 INSERT INTO other_sub(type) VALUES ('ground');
 INSERT INTO other_sub(type) VALUES ('soup');
 
+--changeset jfs:16
+--02/12/2024 create pork_sub table and insert values
+CREATE TABLE IF NOT EXISTS `foodinv`.`pork_sub` (
+    `pork_sub_id` INT NOT NULL AUTO_INCREMENT,
+    `type` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`pork_sub_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+INSERT INTO pork_sub(type) VALUES ('ground');
+INSERT INTO pork_sub(type) VALUES ('chop');
+INSERT INTO pork_sub(type) VALUES ('sausage - loose');
+INSERT INTO pork_sub(type) VALUES ('sausage - cased');
+INSERT INTO pork_sub(type) VALUES ('steak');
+INSERT INTO pork_sub(type) VALUES ('shoulder');
+INSERT INTO pork_sub(type) VALUES ('rib');
+INSERT INTO pork_sub(type) VALUES ('belly');
+INSERT INTO pork_sub(type) VALUES ('neck');
+INSERT INTO pork_sub(type) VALUES ('hock');
+
+--changeset jfs:17
+--03/24/2024 create beef_sub table and insert values
+CREATE TABLE IF NOT EXISTS `foodinv`.`beef_sub` (
+    `beef_sub_id` INT NOT NULL AUTO_INCREMENT,
+    `type` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`beef_sub_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+INSERT INTO beef_sub(type) VALUES ('ground');
+INSERT INTO beef_sub(type) VALUES ('brisket');
+INSERT INTO beef_sub(type) VALUES ('sausage - loose');
+INSERT INTO beef_sub(type) VALUES ('sausage - cased');
+INSERT INTO beef_sub(type) VALUES ('steak');
+INSERT INTO beef_sub(type) VALUES ('shoulder');
+INSERT INTO beef_sub(type) VALUES ('rib');
+INSERT INTO beef_sub(type) VALUES ('neck');
+INSERT INTO beef_sub(type) VALUES ('tenderloin');
+
 
 
 

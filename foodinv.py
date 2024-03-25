@@ -500,11 +500,16 @@ def get_selections():
 
     # sub_type selection
     # -------------------
+    # empty sub_type list and concatenate ptype value to pull choices from
+    # the proper sub_type list
+    # -------------------------
     sub_type_list = []
     sub = (ptype + "_sub")
     print(sub)
     mysql_select_sub_query = ("SELECT type FROM " + sub)
 
+    # execute query to display choices
+    # ---------------------------------
     cursor = CONNECTION.cursor(buffered = True)
     cursor.execute(mysql_select_sub_query)    
     rows = cursor.fetchall()
