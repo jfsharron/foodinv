@@ -53,7 +53,8 @@ XUSER       = 'jfsharron'
 XWORD       = 'marie151414'
 HOST        = '192.168.2.107'
 DATABASE    = 'foodinv'
-DATAFILE    = '//192.168.2.102/share'
+# DATAFILE    = '//192.168.2.102/share'
+DATAFILE    = '//192.168.2.104/share/share'
 
 try:
     CONNECTION = mysql.connector.connect(user=XUSER, password=XWORD,

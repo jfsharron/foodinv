@@ -192,6 +192,14 @@ INSERT INTO beef_sub(type) VALUES ('rib');
 INSERT INTO beef_sub(type) VALUES ('neck');
 INSERT INTO beef_sub(type) VALUES ('tenderloin');
 
+--changeset jfs:18
+--04/27/2024 add mussel to seafood_sub table
+INSERT INTO seafood_sub(type) VALUES ('mussel');
+
+--changeset jfs:19
+--09/21/2024 add cheese to other_sub table
+INSERT INTO other_sub(type) VALUES ('cheese');
+
 
 
 
