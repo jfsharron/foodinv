@@ -200,6 +200,22 @@ INSERT INTO seafood_sub(type) VALUES ('mussel');
 --09/21/2024 add cheese to other_sub table
 INSERT INTO other_sub(type) VALUES ('cheese');
 
+--changeset jfs:20
+--10/07/2024 add fowl to type table, add fowl_sub table, add cornish hen to 
+--fowl_sub table, add bacon to pork_sub table, add fish-seabass to seafood_sub
+--table
+INSERT INTO type(type, type_prefix) VALUES ('fowl', 'fo');
+
+CREATE TABLE IF NOT EXISTS `foodinv`.`fowl_sub` (
+    `fowl_sub_id` INT NOT NULL AUTO_INCREMENT,
+    `type` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`fowl_sub_id`));
+
+INSERT INTO fowl_sub(type) VALUES ('cornish hen');   
+
+INSERT INTO pork_sub(type) VALUES ('bacon');  
+
+INSERT INTO seafood_sub(type) VALUES ('fish-seabass');  
 
 
 
