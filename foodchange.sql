@@ -217,6 +217,10 @@ INSERT INTO pork_sub(type) VALUES ('bacon');
 
 INSERT INTO seafood_sub(type) VALUES ('fish-seabass');  
 
+--changeset jfs:21
+--11/29/2024 add butter to other_sub table
+INSERT INTO other_sub(type) VALUES ('butter');
+
 
 
 
