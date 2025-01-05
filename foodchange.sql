@@ -221,6 +221,10 @@ INSERT INTO seafood_sub(type) VALUES ('fish-seabass');
 --11/29/2024 add butter to other_sub table
 INSERT INTO other_sub(type) VALUES ('butter');
 
+--changeset jfs:22
+--041/05/2025 add fish-salmon to seafood_sub table
+INSERT INTO seafood_sub(type) VALUES ('fish-salmon');
+
 
 
 
