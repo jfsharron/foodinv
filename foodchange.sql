@@ -225,6 +225,10 @@ INSERT INTO other_sub(type) VALUES ('butter');
 --041/05/2025 add fish-salmon to seafood_sub table
 INSERT INTO seafood_sub(type) VALUES ('fish-salmon');
 
+--changeset jfs:23
+--01/11/2025 add meal to other_sub table
+INSERT INTO other_sub(type) VALUES ('meal');
+
 
 
 
