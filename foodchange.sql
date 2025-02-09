@@ -229,7 +229,9 @@ INSERT INTO seafood_sub(type) VALUES ('fish-salmon');
 --01/11/2025 add meal to other_sub table
 INSERT INTO other_sub(type) VALUES ('meal');
 
-
+--changeset jfs:24
+--02/09/2025 add ox-tail to beef_sub table
+INSERT INTO beef_sub(type) VALUES ('ox-tail');
 
 
 
