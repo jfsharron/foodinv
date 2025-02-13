@@ -168,6 +168,7 @@ def reportMenu():
         print('1\tQUERY ALL RECORDS')
         print('2\tFILTER RECORDS BY SUBTYPE')
         print('3\tDISCARD bad_list report (only available for current seesion)')
+        print('4\tQUERY IN-STOCK RECORDS ONLY')
         print('')
         print('')
         print('')
@@ -184,6 +185,8 @@ def reportMenu():
             sub_report_filtered()
         elif menuOption == '3':
             bad_list_report()
+        elif menuOption == '4':
+            sub_report_ins()
         elif menuOption == '0':    
             goAgain = 0 
 
@@ -321,6 +324,91 @@ def sub_report_all():
         # ------------------
         webbrowser.get(using='lynx').open \
             ("/data/share/foodinv/report/report_all_records.html")
+        print('')
+        print("You may also access your report from the Reports Directory")
+        print('')
+        wait = input("Press ENTER to return") 
+
+def sub_report_ins():
+    """
+    =======================================================================
+    Function:       sub_report_ins()
+    Purpose:        generate instock inventory report
+    Parameter(s):   -None-
+    Return:         instock inventory report
+    =======================================================================
+    """
+    # format screen
+    # --------------
+    now = datetime.datetime.now()
+    print(Fore.GREEN + now.strftime("%Y-%m-%d %H:%M:%S").rjust(80))
+    print(("foodinv").rjust(80))
+    print("-----------------------".rjust(80))
+    print(Style.RESET_ALL)
+    print('')
+    print(Fore.GREEN + 'INSTOCK RECORDS')
+    print(Fore.GREEN + '-------------------')
+    print(Style.RESET_ALL)
+
+    # display report on screen
+    # ------------------ ------
+    mysql_select_query = ("SELECT * FROM inv WHERE discard = 0 ORDER BY type," \
+                          " sub_type, date_packaged")
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query)    
+    mytable = from_db_cursor(cursor)
+    mytable.align = "l"
+    print(mytable)
+    print('')
+
+    # send report to browser
+    # -----------------------
+    printRep = input(Fore.YELLOW + 'To send this report to the browser '
+                    'for printing or saving enter b or B, otherwise press '
+                    'enter to return: ')
+    print(Style.RESET_ALL)
+    if printRep == "b" or printRep == "B":
+
+        # generate data for report
+        # ------------------------
+        mysql_search_query = ("SELECT * FROM inv WHERE discard = 0 ORDER BY "  
+                          "type, sub_type, date_packaged")
+        cursor = CONNECTION.cursor(buffered = True)
+        cursor.execute(mysql_search_query)
+        mytable1 = pd.read_sql("SELECT * FROM inv WHERE discard = 0 ORDER BY " 
+                          "type, sub_type, date_packaged", CONNECTION)
+        pd.set_option('display.expand_frame_repr', False)
+        mytable2 = build_table(mytable1,
+                             'grey_light',
+                             font_size = 'small',
+                             font_family = 'Open Sans, courier',
+                             text_align = 'left ')
+        
+        # generate html content
+        # ---------------------
+        html_content = f"<html> \
+                        <head> <h2> FOODINV Records Report - Instock Records\
+                        </h2> \
+                        <h3> <script>\
+                        var timestamp = Date.now();\
+                        var d = new Date(timestamp);\
+                        document.write(d);\
+                        </script>\
+                        </h3>\
+                        </head> \
+                        <body> {mytable2} \
+                        </body> \
+                        </html>"
+        with open('/data/share/foodinv/report/report_ins_records.html', "w") \
+            as html_file:
+            html_file.write(html_content)
+            print("Created")
+        time.sleep(2)
+
+        # display in browser
+        # ------------------
+        webbrowser.get(using='lynx').open \
+            ("/data/share/foodinv/report/report_ins_records.html")
         print('')
         print("You may also access your report from the Reports Directory")
         print('')
