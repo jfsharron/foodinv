@@ -166,9 +166,9 @@ def reportMenu():
         # menu options
         # -------------
         print('1\tQUERY ALL RECORDS')
-        print('2\tFILTER RECORDS BY SUBTYPE')
+        print('2\tQUERY IN-STOCK RECORDS ONLY')
         print('3\tDISCARD bad_list report (only available for current seesion)')
-        print('4\tQUERY IN-STOCK RECORDS ONLY')
+        print('4\tFILTERED BY TYPE')
         print('5\ttesting')
         print('')
         print('')
@@ -181,13 +181,46 @@ def reportMenu():
         menuOption = input("selection: ")
 
         if menuOption == '1':
-            sub_report_all()
+            rep_name = "all_records" 
+            rep_query = "SELECT * FROM inv;"
+            report_temp(rep_name, rep_query)
         elif menuOption == '2':
-            sub_report_filtered()
+            rep_name = "instock_records"
+            rep_query = "SELECT * FROM inv WHERE discard = 0 ORDER BY type," \
+                        " sub_type, date_packaged"
+            report_temp(rep_name, rep_query)
         elif menuOption == '3':
             bad_list_report()
         elif menuOption == '4':
-            sub_report_ins()
+            # create report options
+            # ---------------------
+            report_type_list = []
+            mysql_select_query = ("SELECT type FROM type")
+        
+            cursor = CONNECTION.cursor(buffered = True)
+            cursor.execute(mysql_select_query)    
+            rows = cursor.fetchall()
+            for row in rows:
+                row = str(row)
+                row = row.strip(",()'")
+                report_type_list.append(row)
+        
+            questions = [
+              inquirer.List('report_type',
+                            message="What type do you want to query?",
+                            choices=report_type_list,
+                            ),
+            ]
+            answers = inquirer.prompt(questions)
+            report_type = str(answers["report_type"])
+            print(report_type)
+            report_type = str("'" + report_type + "'")
+            #report variables
+            #----------------
+            rep_name = "filtered_report - " + report_type
+            rep_query = "SELECT * FROM inv WHERE type = " + report_type + \
+                        "ORDER BY type, sub_type, date_packaged"
+            report_temp(rep_name, rep_query)
         elif menuOption == '5':
             rep_name = "test" 
             rep_query = "SELECT * FROM inv;"
@@ -249,7 +282,7 @@ def report_temp(rep_name, rep_query):
       # generate html content
       # ---------------------
       html_content = f"<html> \
-                      <head> <h2> FOODINV Records Report - All Records\
+                      <head> <h2> FOODINV Records Report - {rep_name}\
                       </h2> \
                       <h3> <script>\
                       var timestamp = Date.now();\
@@ -261,7 +294,7 @@ def report_temp(rep_name, rep_query):
                       <body> {mytable2} \
                       </body> \
                       </html>"
-      with open('/data/share/foodinv/report/'+rep_name+'report_all_records.html', "w") \
+      with open('/data/share/foodinv/report/report_' + rep_name +'.html', "w") \
           as html_file:
           html_file.write(html_content)
           print("Created")
@@ -269,7 +302,7 @@ def report_temp(rep_name, rep_query):
       # display in browser
       # ------------------
       webbrowser.get(using='lynx').open \
-          ("/data/share/foodinv/report/"+rep_name+"report_all_records.html")
+          ("/data/share/foodinv/report/report_" + rep_name + ".html")
       print('')
       print("You may also access your report from the Reports Directory")
       print('')
