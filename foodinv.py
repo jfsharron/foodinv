@@ -221,21 +221,51 @@ def reportMenu():
             rep_query = "SELECT * FROM inv WHERE type = " + report_type + \
                         "ORDER BY type, sub_type, date_packaged"
             report_temp(rep_name, rep_query)
+        
+        
+        
+        
         elif menuOption == '5':
-            rep_name = "test" 
-            rep_query = "SELECT * FROM inv;"
-            report_temp(rep_name, rep_query)
+            rep_name = input("Enter report name: ")
+            cursor = CONNECTION.cursor(buffered = True)
+            cursor.execute("SELECT query FROM report WHERE name = " + rep_name)
+            row = cursor.fetchone()
+            for row in cursor:
+                row = cursor.fetchone()
+                row = str(row)    
+            rep_query = row
+            x = str(rep_query)
+            x= x.strip("()")
+            x = x.strip("'")
+            x = x.rstrip("',")
+            cursor.execute("SELECT description FROM report WHERE name = " + rep_name)
+            row = cursor.fetchone()
+            for row in cursor:
+                row = cursor.fetchone()
+                row = str(row)    
+            rep_na = row
+            y = str(rep_na)
+            y= y.strip("()")
+            y = y.strip("'")
+            y = y.rstrip("',")
+            report_temp(y, x, rep_name)
+
+        
+        
+        
+        
+        
         elif menuOption == '0':    
             goAgain = 0 
 
         os.system('cls') 
 
-def report_temp(rep_name, rep_query):
+def report_temp(rep_name, rep_query, rep_no):
   """
   =======================================================================
-  Function:       report_temp()
+  Function:       report_temp(rep_name, rep_query, rep_no)
   Purpose:        generate a report
-  Parameter(s):   rep_name, rep_query
+  Parameter(s):   rep_name, rep_query, rep_no
   Return:         generated report
   =======================================================================
   """
@@ -247,7 +277,7 @@ def report_temp(rep_name, rep_query):
   print("-----------------------".rjust(80))
   print(Style.RESET_ALL)
   print('')
-  print(Fore.GREEN + rep_name)
+  print(Fore.GREEN + rep_name + " " + rep_no)
   print(Fore.GREEN + '-------------------')
   print(Style.RESET_ALL)
   # display report on screen
@@ -281,8 +311,9 @@ def report_temp(rep_name, rep_query):
       
       # generate html content
       # ---------------------
+      report = rep_name + "_" + rep_no
       html_content = f"<html> \
-                      <head> <h2> FOODINV Records Report - {rep_name}\
+                      <head> <h2> FOODINV Records Report - {rep_name} {rep_no}\
                       </h2> \
                       <h3> <script>\
                       var timestamp = Date.now();\
@@ -294,7 +325,7 @@ def report_temp(rep_name, rep_query):
                       <body> {mytable2} \
                       </body> \
                       </html>"
-      with open('/data/share/foodinv/report/report_' + rep_name +'.html', "w") \
+      with open('/data/share/foodinv/report/report_' + report +'.html', "w") \
           as html_file:
           html_file.write(html_content)
           print("Created")
@@ -302,7 +333,7 @@ def report_temp(rep_name, rep_query):
       # display in browser
       # ------------------
       webbrowser.get(using='lynx').open \
-          ("/data/share/foodinv/report/report_" + rep_name + ".html")
+          ("/data/share/foodinv/report/report_" + report + ".html")
       print('')
       print("You may also access your report from the Reports Directory")
       print('')

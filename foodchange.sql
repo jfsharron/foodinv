@@ -233,12 +233,35 @@ INSERT INTO other_sub(type) VALUES ('meal');
 --02/09/2025 add ox-tail to beef_sub table
 INSERT INTO beef_sub(type) VALUES ('ox-tail');
 
+--changeset jfs:25
+--02/21/2025 add loin and tenderloin to pork_sub table
+INSERT INTO pork_sub(type) VALUES ('loin');
+INSERT INTO pork_sub(type) VALUES ('tenderloin');
 
+--changeset jfs:26
+--02/22/2025 create table report
+CREATE TABLE IF NOT EXISTS `foodinv`.`report` (
+    `report_id` INT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(10),
+    `description` VARCHAR(75),
+    `query` VARCHAR(200),
+    `notes` VARCHAR(200),
+    `date_create` DATE,
+    `date_mod` DATE,
+    PRIMARY KEY (`report_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
 
-
-
-
-
+--changeset jfs:27
+--02/23/2025 add sample data to report table
+INSERT INTO report (name, description, query, notes, date_create, date_mod) 
+VALUES (
+    '12345', 
+    'in-stock records',
+    'SELECT * FROM inv WHERE discard = 0 ORDER BY type, sub_type, date_packaged',
+    '',
+    '2025-02-23',
+    '2025-02-23')
 
 
 
