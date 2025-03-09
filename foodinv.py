@@ -165,11 +165,11 @@ def reportMenu():
 
         # menu options
         # -------------
-        print('1\tQUERY ALL RECORDS')
-        print('2\tQUERY IN-STOCK RECORDS ONLY')
-        print('3\tDISCARD bad_list report (only available for current seesion)')
-        print('4\tFILTERED BY TYPE')
-        print('5\ttesting')
+        print('1\tREPORT INDEX')
+        print('2\tRUN REPORT')
+        print('3\t')
+        print('4\t')
+        print('5\t')
         print('')
         print('')
         print('')
@@ -181,84 +181,46 @@ def reportMenu():
         menuOption = input("selection: ")
 
         if menuOption == '1':
-            rep_name = "all_records" 
-            rep_query = "SELECT * FROM inv;"
-            report_temp(rep_name, rep_query)
+            rep_name = str(11111) 
+            report_temp2(rep_name)          
         elif menuOption == '2':
-            rep_name = "instock_records"
-            rep_query = "SELECT * FROM inv WHERE discard = 0 ORDER BY type," \
-                        " sub_type, date_packaged"
-            report_temp(rep_name, rep_query)
-        elif menuOption == '3':
-            bad_list_report()
-        elif menuOption == '4':
-            # create report options
-            # ---------------------
-            report_type_list = []
-            mysql_select_query = ("SELECT type FROM type")
-        
-            cursor = CONNECTION.cursor(buffered = True)
-            cursor.execute(mysql_select_query)    
-            rows = cursor.fetchall()
-            for row in rows:
-                row = str(row)
-                row = row.strip(",()'")
-                report_type_list.append(row)
-        
-            questions = [
-              inquirer.List('report_type',
-                            message="What type do you want to query?",
-                            choices=report_type_list,
-                            ),
-            ]
-            answers = inquirer.prompt(questions)
-            report_type = str(answers["report_type"])
-            print(report_type)
-            report_type = str("'" + report_type + "'")
-            #report variables
-            #----------------
-            rep_name = "filtered_report - " + report_type
-            rep_query = "SELECT * FROM inv WHERE type = " + report_type + \
-                        "ORDER BY type, sub_type, date_packaged"
-            report_temp(rep_name, rep_query)
-        
-        
-        
-        
-        elif menuOption == '5':
             rep_name = input("Enter report name: ")
-            cursor = CONNECTION.cursor(buffered = True)
-            cursor.execute("SELECT query FROM report WHERE name = " + rep_name)
-            row = cursor.fetchone()
-            for row in cursor:
-                row = cursor.fetchone()
-                row = str(row)    
-            rep_query = row
-            x = str(rep_query)
-            x= x.strip("()")
-            x = x.strip("'")
-            x = x.rstrip("',")
-            cursor.execute("SELECT description FROM report WHERE name = " + rep_name)
-            row = cursor.fetchone()
-            for row in cursor:
-                row = cursor.fetchone()
-                row = str(row)    
-            rep_na = row
-            y = str(rep_na)
-            y= y.strip("()")
-            y = y.strip("'")
-            y = y.rstrip("',")
-            report_temp(y, x, rep_name)
-
-        
-        
-        
-        
-        
+            report_temp2(rep_name)
         elif menuOption == '0':    
             goAgain = 0 
 
         os.system('cls') 
+
+def report_temp2(rep_name):
+  """
+  =======================================================================
+  Function:       report_temp2(rep_name)
+  Purpose:        pull required fields from MySQL to generate report
+  Parameter(s):   rep_name
+  Return:         rep_name, rep_query, rep_no
+  =======================================================================
+  """
+  cursor.execute("SELECT query FROM report WHERE name = " + rep_name)
+  row = cursor.fetchone()
+  for row in cursor:
+      row = cursor.fetchone()
+      row = str(row)    
+  rep_query = row
+  x = str(rep_query)
+  x= x.strip("()")
+  x = x.strip("'")
+  x = x.rstrip("',")
+  cursor.execute("SELECT description FROM report WHERE name = " + rep_name)
+  row = cursor.fetchone()
+  for row in cursor:
+      row = cursor.fetchone()
+      row = str(row)    
+  rep_na = row
+  y = str(rep_na)
+  y= y.strip("()")
+  y = y.strip("'")
+  y = y.rstrip("',")
+  report_temp(y, x, rep_name)
 
 def report_temp(rep_name, rep_query, rep_no):
   """
@@ -338,7 +300,6 @@ def report_temp(rep_name, rep_query, rep_no):
       print("You may also access your report from the Reports Directory")
       print('')
       wait = input("Press ENTER to return") 
-
 
 def bad_list_report():
     """

@@ -263,6 +263,23 @@ VALUES (
     '2025-02-23',
     '2025-02-23')
 
+--changeset jfs:28
+--03/09/2025 add index report to table report
+INSERT INTO report (name, description, query, notes, date_create, date_mod) 
+VALUES (
+    -- name
+    '11111', 
+    -- description
+    'report_index',
+    --query
+    'SELECT * FROM report',
+    -- notes
+    '',
+    -- date_create
+    '2025-03-09',
+    -- date_mod
+    '2025-03-09')    
+
 
 
 
