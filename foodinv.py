@@ -53,8 +53,6 @@ XUSER       = 'jfsharron'
 XWORD       = 'marie151414'
 HOST        = '192.168.2.107'
 DATABASE    = 'foodinv'
-# DATAFILE    = '//192.168.2.102/share'
-DATAFILE    = '//192.168.2.104/share/share'
 
 try:
     CONNECTION = mysql.connector.connect(user=XUSER, password=XWORD,
@@ -79,8 +77,8 @@ weight_unit_list    = []
 sub_type_list       = []
 LABELFILE           = '/data/share/foodinv/food_label.xlsx'
 RUN_ONCE            = 1
-good_list           = []
-bad_list            = []
+
+
 
 # ==============================================================================
 # user functions
@@ -300,341 +298,6 @@ def report_temp(rep_name, rep_query, rep_no):
       print("You may also access your report from the Reports Directory")
       print('')
       wait = input("Press ENTER to return") 
-
-def bad_list_report():
-    """
-    =======================================================================
-    Function:       bad_list_report()
-    Purpose:        generate report of bad_list (current seesion)
-    Parameter(s):   -None-
-    Return:         bad_list report
-    =======================================================================
-    """
-    # display report on screen
-    # ------------------------
-    print(bad_list)
-
-    # send report to browser
-    # -----------------------
-    printRep = input(Fore.YELLOW + 'To send this report to the browser '
-                    'for printing or saving enter b or B, otherwise press '
-                    'enter to return: ')
-    print(Style.RESET_ALL)
-    
-    if printRep == "b" or printRep == "B":
-
-        # generate html content
-        # ---------------------
-        html_content = f"<html> \
-                        <head> <h2> FOODINV Records Report - bad_list\
-                        </h2> \
-                        <h3> <script>\
-                        var timestamp = Date.now();\
-                        var d = new Date(timestamp);\
-                        document.write(d);\
-                        </script>\
-                        </h3>\
-                        </head> \
-                        <body> {bad_list} \
-                        </body> \
-                        </html>"
-        with open('/data/share/foodinv/report/report_bad_list.html', "w") \
-            as html_file:
-            html_file.write(html_content)
-            print("Created")
-        time.sleep(2)
-
-        # display in browser
-        # ------------------
-        webbrowser.get(using='lynx').open \
-            ("/data/share/foodinv/report/report_bad_list.html")
-        print('')
-        print("You may also access your report from the Reports Directory")
-        print('')
-        wait = input("Press ENTER to return") 
-
-def sub_report_all():
-    """
-    =======================================================================
-    Function:       sub_report_all()
-    Purpose:        generate entire inventory report
-    Parameter(s):   -None-
-    Return:         entire inventory report
-    =======================================================================
-    """
-    # format screen
-    # --------------
-    now = datetime.datetime.now()
-    print(Fore.GREEN + now.strftime("%Y-%m-%d %H:%M:%S").rjust(80))
-    print(("foodinv").rjust(80))
-    print("-----------------------".rjust(80))
-    print(Style.RESET_ALL)
-    print('')
-    print(Fore.GREEN + 'ALL RECORDS')
-    print(Fore.GREEN + '-------------------')
-    print(Style.RESET_ALL)
-
-    # display report on screen
-    # ------------------------
-    mysql_select_query = ("SELECT * FROM inv ORDER BY type, sub_type, " \
-                          "date_packaged")
-    cursor = CONNECTION.cursor(buffered = True)
-    cursor.execute(mysql_select_query)    
-    mytable = from_db_cursor(cursor)
-    mytable.align = "l"
-    print(mytable)
-    print('')
-
-    # send report to browser
-    # -----------------------
-    printRep = input(Fore.YELLOW + 'To send this report to the browser '
-                    'for printing or saving enter b or B, otherwise press '
-                    'enter to return: ')
-    print(Style.RESET_ALL)
-    if printRep == "b" or printRep == "B":
-
-        # generate data for report
-        # ------------------------
-        mysql_search_query = ("SELECT * FROM inv ORDER BY type, sub_type, " \
-                          "date_packaged")
-        cursor = CONNECTION.cursor(buffered = True)
-        cursor.execute(mysql_search_query)
-        mytable1 = pd.read_sql("SELECT * FROM inv ORDER BY type, sub_type, " \
-                          "date_packaged", CONNECTION)
-        pd.set_option('display.expand_frame_repr', False)
-        mytable2 = build_table(mytable1,
-                             'grey_light',
-                             font_size = 'small',
-                             font_family = 'Open Sans, courier',
-                             text_align = 'left ')
-        
-        # generate html content
-        # ---------------------
-        html_content = f"<html> \
-                        <head> <h2> FOODINV Records Report - All Records\
-                        </h2> \
-                        <h3> <script>\
-                        var timestamp = Date.now();\
-                        var d = new Date(timestamp);\
-                        document.write(d);\
-                        </script>\
-                        </h3>\
-                        </head> \
-                        <body> {mytable2} \
-                        </body> \
-                        </html>"
-        with open('/data/share/foodinv/report/report_all_records.html', "w") \
-            as html_file:
-            html_file.write(html_content)
-            print("Created")
-        time.sleep(2)
-
-        # display in browser
-        # ------------------
-        webbrowser.get(using='lynx').open \
-            ("/data/share/foodinv/report/report_all_records.html")
-        print('')
-        print("You may also access your report from the Reports Directory")
-        print('')
-        wait = input("Press ENTER to return") 
-
-def sub_report_ins():
-    """
-    =======================================================================
-    Function:       sub_report_ins()
-    Purpose:        generate instock inventory report
-    Parameter(s):   -None-
-    Return:         instock inventory report
-    =======================================================================
-    """
-    # format screen
-    # --------------
-    now = datetime.datetime.now()
-    print(Fore.GREEN + now.strftime("%Y-%m-%d %H:%M:%S").rjust(80))
-    print(("foodinv").rjust(80))
-    print("-----------------------".rjust(80))
-    print(Style.RESET_ALL)
-    print('')
-    print(Fore.GREEN + 'INSTOCK RECORDS')
-    print(Fore.GREEN + '-------------------')
-    print(Style.RESET_ALL)
-
-    # display report on screen
-    # ------------------ ------
-    mysql_select_query = ("SELECT * FROM inv WHERE discard = 0 ORDER BY type," \
-                          " sub_type, date_packaged")
-    cursor = CONNECTION.cursor(buffered = True)
-    cursor.execute(mysql_select_query)    
-    mytable = from_db_cursor(cursor)
-    mytable.align = "l"
-    print(mytable)
-    print('')
-
-    # send report to browser
-    # -----------------------
-    printRep = input(Fore.YELLOW + 'To send this report to the browser '
-                    'for printing or saving enter b or B, otherwise press '
-                    'enter to return: ')
-    print(Style.RESET_ALL)
-    if printRep == "b" or printRep == "B":
-
-        # generate data for report
-        # ------------------------
-        mysql_search_query = ("SELECT * FROM inv WHERE discard = 0 ORDER BY "  
-                          "type, sub_type, date_packaged")
-        cursor = CONNECTION.cursor(buffered = True)
-        cursor.execute(mysql_search_query)
-        mytable1 = pd.read_sql("SELECT * FROM inv WHERE discard = 0 ORDER BY " 
-                          "type, sub_type, date_packaged", CONNECTION)
-        pd.set_option('display.expand_frame_repr', False)
-        mytable2 = build_table(mytable1,
-                             'grey_light',
-                             font_size = 'small',
-                             font_family = 'Open Sans, courier',
-                             text_align = 'left ')
-        
-        # generate html content
-        # ---------------------
-        html_content = f"<html> \
-                        <head> <h2> FOODINV Records Report - Instock Records\
-                        </h2> \
-                        <h3> <script>\
-                        var timestamp = Date.now();\
-                        var d = new Date(timestamp);\
-                        document.write(d);\
-                        </script>\
-                        </h3>\
-                        </head> \
-                        <body> {mytable2} \
-                        </body> \
-                        </html>"
-        with open('/data/share/foodinv/report/report_ins_records.html', "w") \
-            as html_file:
-            html_file.write(html_content)
-            print("Created")
-        time.sleep(2)
-
-        # display in browser
-        # ------------------
-        webbrowser.get(using='lynx').open \
-            ("/data/share/foodinv/report/report_ins_records.html")
-        print('')
-        print("You may also access your report from the Reports Directory")
-        print('')
-        wait = input("Press ENTER to return") 
-
-def sub_report_filtered():
-    """
-    =======================================================================
-    Function:       sub_report_filtered()
-    Purpose:        generate filtered (by type) inventory report
-    Parameter(s):   -None-
-    Return:         filtered (by type) inventory report
-    =======================================================================
-    """
-    # format screen
-    # --------------
-    now = datetime.datetime.now()
-    print(Fore.GREEN + now.strftime("%Y-%m-%d %H:%M:%S").rjust(80))
-    print(("foodinv").rjust(80))
-    print("-----------------------".rjust(80))
-    print(Style.RESET_ALL)
-    print('')
-    print(Fore.GREEN + 'FILTERED (BY TYPE) RECORDS')
-    print(Fore.GREEN + '-------------------')
-    print(Style.RESET_ALL)
-
-    # create report options
-    # ---------------------
-    report_type_list = []
-    mysql_select_query = ("SELECT type FROM type")
-
-    cursor = CONNECTION.cursor(buffered = True)
-    cursor.execute(mysql_select_query)    
-    rows = cursor.fetchall()
-    for row in rows:
-        row = str(row)
-        row = row.strip(",()'")
-        report_type_list.append(row)
-
-    questions = [
-      inquirer.List('report_type',
-                    message="What type do you want to query?",
-                    choices=report_type_list,
-                    ),
-    ]
-    answers = inquirer.prompt(questions)
-    report_type = str(answers["report_type"])
-    print(report_type)
-    report_type = str("'" + report_type + "'")
-
-    # display report on screen
-    # ------------------------
-    mysql_select_query = ("SELECT * FROM inv WHERE type = " + report_type + \
-                          "ORDER BY type, sub_type, date_packaged")
-    cursor = CONNECTION.cursor(buffered = True)
-    cursor.execute(mysql_select_query)    
-    mytable = from_db_cursor(cursor)
-    mytable.align = "l"
-    print(mytable)
-    print('')
-
-    # send report to browser
-    # -----------------------
-    printRep = input(Fore.YELLOW + 'To send this report to the browser '
-                    'for printing or saving enter b or B, otherwise press '
-                    'enter to return: ')
-    print(Style.RESET_ALL)
-    if printRep == "b" or printRep == "B":
-
-        # generate data for report
-        # ------------------------
-        mysql_search_query = ("SELECT * FROM inv WHERE type = " \
-                               + report_type + "ORDER BY type, sub_type, " \
-                               "date_packaged")
-        cursor = CONNECTION.cursor(buffered = True)
-        cursor.execute(mysql_search_query)
-        mytable1 = pd.read_sql("SELECT * FROM inv WHERE type = " \
-                               + report_type + "ORDER BY type, sub_type, " \
-                               "date_packaged", CONNECTION)
-        pd.set_option('display.expand_frame_repr', False)
-        mytable2 = build_table(mytable1,
-                             'grey_light',
-                             font_size = 'small',
-                             font_family = 'Open Sans, courier',
-                             text_align = 'left ')
-        
-        # generate html content
-        # ---------------------
-        html_content = f"<html> \
-                        <head> <h2> FOODINV Records Report - \
-                            Filtered (by sub_type) Records \
-                        </h2> \
-                        <h3> <script>\
-                        var timestamp = Date.now();\
-                        var d = new Date(timestamp);\
-                        document.write(d);\
-                        </script>\
-                        </h3>\
-                        </head> \
-                        <body> {mytable2} \
-                        </body> \
-                        </html>"
-        with open \
-            ('/data/share/foodinv/report/report_filsubtype_records.html', "w") \
-            as html_file:
-            html_file.write(html_content)
-            print("Created")
-        time.sleep(2)
-
-        # display in browser
-        # ------------------
-        webbrowser.get(using='lynx').open \
-            ("/data/share/foodinv/report/report_filsubtype_records.html")
-        print('')
-        print("You may also access your report from the Reports Directory")
-        print('')
-        wait = input("Press ENTER to return") 
 
 def get_selections():
     """
@@ -1024,9 +687,6 @@ def discard():
             CONNECTION.commit()
 
     elif discardOption == 'batch':
-        data = pd.read_excel(LABELFILE, sheet_name = 'discard', usecols = \
-                             ['code'])
-
         # Load the workbook
         # -----------------
         workbook = openpyxl.load_workbook(LABELFILE)
@@ -1040,6 +700,8 @@ def discard():
 
         # Check data for erroneous input values
         # --------------------------------------
+        bad_list = []
+        good_list = []
         for value in column_values_list :
             value = ("'" + value + "'")
             mysql_select_query = ("SELECT * FROM inv WHERE code = " + value)
@@ -1049,23 +711,33 @@ def discard():
 
             if sel_res is None:
                 bad_list.append(value)
+
             else:
                 good_list.append(value)
 
-            # Update database
-            # ---------------
-            for i in good_list:
-                sql_up_query = ("""UPDATE inv SET discard = 1 WHERE code = """ \
-                                 + i)
-                cursor.execute(sql_up_query)
-                CONNECTION.commit()    
+        # Update database
+        # ---------------
+        for i in good_list:
+            sql_up_query = ("""UPDATE inv SET discard = 1 WHERE code = """ \
+                             + i)
+            cursor.execute(sql_up_query)
+            CONNECTION.commit()  
+        for i in bad_list:
+            today = date.today()
+            data = (i, "0", today)
+            save_query = ("INSERT INTO badlist (value,correction_made, \
+                           date_create)"
+                        "VALUES (%s, %s, %s)")
+            cursor = CONNECTION.cursor()
+            cursor.execute(save_query, data)
+            CONNECTION.commit()    
             
         # Print update messages
         # ----------------------
         print("Data Updated!") 
-        if len(bad_list) > 0:
-            print("These values were not found in the database")
-            print(bad_list)
+        print("These values were not found in the database")
+        res = ", ".join(str(x) for x in bad_list)
+        print(res)
         print('')
 
 # ==============================================================================

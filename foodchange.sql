@@ -264,23 +264,93 @@ VALUES (
     '2025-02-23')
 
 --changeset jfs:28
---03/09/2025 add index report to table report
+--03/10/2025 add index report to table report
 INSERT INTO report (name, description, query, notes, date_create, date_mod) 
 VALUES (
     -- name
-    '11111', 
+    '12344', 
     -- description
-    'report_index',
+    'discard_bad_list',
     --query
-    'SELECT * FROM report',
+    'print(bad_list)',
+    -- notes
+    'only valid for current session',
+    -- date_create
+    '2025-03-10',
+    -- date_mod
+    '2025-03-10')    
+
+--changeset jfs:29
+--03/10/2025 liquibase test
+INSERT INTO report (name, description, query, notes, date_create, date_mod) 
+VALUES (
+    -- name
+    'test', 
+    -- description
+    'test',
+    --query
+    'test',
     -- notes
     '',
     -- date_create
-    '2025-03-09',
+    '2025-03-10',
     -- date_mod
-    '2025-03-09')    
+    '2025-03-10')  
 
+--changeset jfs:30
+--03/14/2025 create table badlist
+CREATE TABLE IF NOT EXISTS `foodinv`.`badlist` (
+    `badlist_id` INT NOT NULL AUTO_INCREMENT,
+    `value` VARCHAR(10),
+    `correction_made` TINYINT(1),
+    `date_create` DATE,
+    `date_mod` DATE,
+    PRIMARY KEY (`badlist_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;  
 
+--changeset jfs:31
+--03/14/2025 modify discart_bad_list reopet query
+UPDATE report SET query = 'SELECT *FROM bad_list' WHERE report_id = 4
+
+--changeset jfs:32
+--03/14/2025 correction for sql syntax error in changeset 31
+UPDATE report SET query = 'SELECT * FROM bad_list' WHERE report_id = 4
+
+--changeset jfs:33
+--03/14/2025 correction for wrong tablename in changeset(s) 31 and 32
+UPDATE report SET query = 'SELECT * FROM badlist' WHERE report_id = 4
+
+--changeset jfs:34
+--03/14/2025 add all records report
+INSERT INTO report (name, description, query, notes, date_create, date_mod) 
+VALUES (
+    -- name
+    '12346', 
+    -- description
+    'entire inventory report including discard',
+    --query
+    'SELECT * FROM inv',
+    -- notes
+    '',
+    -- date_create
+    '2025-03-14',
+    -- date_mod
+    '2025-03-14')  
+
+--changeset jfs:35
+--03/14/2025 remove notes from report 12344
+UPDATE report SET notes = '' WHERE report_id = 4
+
+--changeset jfs:36
+--03/14/2025 add order by to report 12346 remove notes from report 12344
+UPDATE report SET query = 'SELECT * FROM inv ORDER BY type, sub_type, 
+                           date_packaged' WHERE report_id = 5
+
+--changeset jfs:37
+--03/14/2025 acorrection to changeset 36
+UPDATE report SET query = 'SELECT * FROM inv ORDER BY type, sub_type,'
+                           'date_packaged' WHERE report_id = 5
 
 
 
