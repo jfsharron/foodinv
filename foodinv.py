@@ -44,6 +44,8 @@ from pretty_html_table import build_table
 from sqlalchemy import create_engine
 import inquirer
 from copy import copy
+import fim1
+import fibo
 
 # ==============================================================================
 # establish database connection
@@ -167,7 +169,7 @@ def reportMenu():
         print('2\tRUN REPORT')
         print('3\t')
         print('4\t')
-        print('5\t')
+        print('5\t TESTING')
         print('')
         print('')
         print('')
@@ -178,48 +180,129 @@ def reportMenu():
 
         menuOption = input("selection: ")
 
-        if menuOption == '1':
-            rep_name = str(11111) 
-            report_temp2(rep_name)          
+        if menuOption == '1':        
+            x = "Report_Index"
+            y = fim1.rq1(1)
+            z = "11111"    
+            report_temp(x,y,z)   
+
         elif menuOption == '2':
             rep_name = input("Enter report name: ")
-            report_temp2(rep_name)
+            test(rep_name)
+
+
+
         elif menuOption == '0':    
             goAgain = 0 
 
         os.system('cls') 
 
-def report_temp2(rep_name):
+
+def test(rep_name):
   """
   =======================================================================
-  Function:       report_temp2(rep_name)
-  Purpose:        pull required fields from MySQL to generate report
-  Parameter(s):   rep_name
-  Return:         rep_name, rep_query, rep_no
+  Function:       
+  Purpose:        
+  Parameter(s):   
+  Return:         
   =======================================================================
   """
-  cursor.execute("SELECT query FROM report WHERE name = " + rep_name)
+  q  = fim1.rq2(1,rep_name)
+  q2 = fim1.rq3(1,rep_name)
+  q3 = fim1.rq4(1,rep_name)
+  q4 = fim1.rq5(1,rep_name)
+  
+  cursor.execute(q)
   row = cursor.fetchone()
   for row in cursor:
       row = cursor.fetchone()
       row = str(row)    
+  
   rep_query = row
   x = str(rep_query)
   x= x.strip("()")
   x = x.strip("'")
   x = x.rstrip("',")
-  cursor.execute("SELECT description FROM report WHERE name = " + rep_name)
+  
+  cursor.execute(q3)
+  row = cursor.fetchone()
+  for row in cursor:
+      row = cursor.fetchone()
+      row = str(row)
+  name = str(row)
+  name = name.strip("()")
+  name = name.strip(",")
+  cursor.execute(q2)
   row = cursor.fetchone()
   for row in cursor:
       row = cursor.fetchone()
       row = str(row)    
-  rep_na = row
-  y = str(rep_na)
-  y= y.strip("()")
-  y = y.strip("'")
-  y = y.rstrip("',")
-  report_temp(y, x, rep_name)
+  args_req = row
+  args_req = str(args_req)
+  args_req = args_req.strip("()")
+  args_req = args_req.strip(",")
 
+  cursor.execute(q4)
+  row = cursor.fetchone()
+  for row in cursor:
+      row = cursor.fetchone()
+      row = str(row)    
+  args = row
+
+  if args_req == "1":
+    args = str(args)
+    args = args.strip("'")
+    args = args.strip("()")
+    print(args)
+    print(type(args))
+
+    arg_list = args.split(",")
+    
+    del arg_list[-1]
+    avalue_list = []
+
+    for i in arg_list:
+        i = i.strip("'")
+        a = input("Enter value for " + i + ": ")
+        a = a= (f'"{a}"')
+        avalue_list.append(a)
+
+    clis = len(avalue_list)
+
+    count = 0
+    para = ("a" + str(count))
+    print("para " + para)
+    count = count + 1
+    para = ("a" + str(count))
+    print("para " + para)
+
+    rep_na = row
+    y = str(rep_na)
+    y= y.strip("()")
+    y = y.strip("'")
+    y = y.rstrip("',")
+
+    defin = fim1.rep2(clis)
+    print("defin: " + defin)
+
+    rep = eval(defin)
+    
+    print("value list length " + str(clis))
+    print("value list :" + str(avalue_list))
+    print(rep)
+    print("are args req: " + args_req)
+    print("args: " + y)
+    print("rep query passed to function: " + str(rep))
+    print("rep name: " + name)
+    print("rep no: " + rep_name)
+    report_temp(name, rep, rep_name)
+  
+  elif args_req == "0":
+    report_temp(name, x, rep_name)
+    print("name: " + name)
+    print("number: " + rep_name)
+    print(x)
+   
 def report_temp(rep_name, rep_query, rep_no):
   """
   =======================================================================
