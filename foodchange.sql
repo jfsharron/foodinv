@@ -352,7 +352,124 @@ UPDATE report SET query = 'SELECT * FROM inv ORDER BY type, sub_type,
 UPDATE report SET query = 'SELECT * FROM inv ORDER BY type, sub_type,'
                            'date_packaged' WHERE report_id = 5
 
+--changeset jfs:38
+--03/23/2025 drop report table to replace with new version
+DROP TABLE report
 
+--changeset jfs:39
+--03/23/2025 recreate report table
+CREATE TABLE IF NOT EXISTS `foodinv`.`report` (
+    `report_id` INT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(10),
+    `description` VARCHAR(75),
+    `query` VARCHAR(200),
+    `notes` VARCHAR(200),
+    `date_create` DATE,
+    `date_mod` DATE,
+	`creator` VARCHAR(75),
+	`args_req` TINYINT(1),
+	`args` VARCHAR(100),
+    PRIMARY KEY (`report_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
 
+--changeset jfs:40
+--03/23/2025 add default reports to report
+INSERT INTO report (name, description, query, notes, date_create, date_mod, creator, args_req, args) 
+VALUES (
+    -- name
+    '11111', 
+    -- description
+    'All Records',
+    --query
+    'SELECT * FROM inv',
+    -- notes
+    '',
+    -- date_create
+    '2025-03-23',
+    -- date_mod
+    '2025-03-23',
+    -- creator
+    '',
+    -- arg_req
+    '0',
+    -- args
+    '')  
 
+--changeset jfs:41
+--03/23/2025 add default reports to report
+INSERT INTO report (name, description, query, notes, date_create, date_mod, creator, args_req, args) 
+VALUES (
+    -- name
+    '123456', 
+    -- description
+    'Filtered - type, discard status',
+    --query
+    'SELECT * FROM inv WHERE (type = {} AND discard = {})',
+    -- notes
+    '',
+    -- date_create
+    '2025-03-23',
+    -- date_mod
+    '2025-03-23',
+    -- creator
+    '',
+    -- arg_req
+    '1',
+    -- args
+    'type, discard')  
 
+--changeset jfs:42
+--03/23/2025 add default reports to report
+INSERT INTO report (name, description, query, notes, date_create, date_mod, creator, args_req, args) 
+VALUES (
+    -- name
+    '123457', 
+    -- description
+    'Filtered - type, discard status, pieces',
+    --query
+    'SELECT * FROM inv WHERE (type = {} AND discard = {} AND sub_type = {} AND'
+     'pieces = {})',
+    -- notes
+    '',
+    -- date_create
+    '2025-03-23',
+    -- date_mod
+    '2025-03-23',
+    -- creator
+    '',
+    -- arg_req
+    '1',
+    -- args
+    'type, discard') 
+
+--changeset jfs:43
+--03/23/2025 correct syntax error in changeset 42
+UPDATE report SET query = 'SELECT * FROM inv WHERE (type = {} '
+    'AND discard = {} AND sub_type = {} AND '
+    'pieces = {})'
+
+--changeset jfs:44
+--03/23/2025 correct syntax error in changeset 43 (missing WHERE statement)
+UPDATE report SET query = 'SELECT * FROM inv'
+WHERE report_id = 1
+
+--changeset jfs:45
+--03/23/2025 correct syntax error in changeset 43 (missing WHERE statement)
+UPDATE report SET query = 'SELECT * FROM inv WHERE (type = {} AND discard = {})'
+WHERE report_id = 2
+
+--changeset jfs:46
+--03/23/2025 correct error in changeset 42 (incorrect description)
+UPDATE report SET description = 'Filtered - type, discard, status, sub_type, pieces'
+WHERE report_id = 3
+
+--changeset jfs:47
+--03/24/2025 correct error in report 123457 - missing "pieces" and "sub_type"args
+UPDATE report SET args = 'type, discard, sub_type, pieces'
+WHERE report_id = 3
+
+--changeset jfs:48
+--03/24/2025 correct error in changeset 42 and 46 (incorrect description)
+UPDATE report SET description = 'Filtered - type, discard status, sub_type, pieces'
+WHERE report_id = 3

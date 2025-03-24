@@ -46,6 +46,7 @@ import inquirer
 from copy import copy
 import fim1
 import fibo
+import re
 
 # ==============================================================================
 # establish database connection
@@ -167,9 +168,6 @@ def reportMenu():
         # -------------
         print('1\tREPORT INDEX')
         print('2\tRUN REPORT')
-        print('3\t')
-        print('4\t')
-        print('5\t TESTING')
         print('')
         print('')
         print('')
@@ -188,7 +186,7 @@ def reportMenu():
 
         elif menuOption == '2':
             rep_name = input("Enter report name: ")
-            test(rep_name)
+            report(rep_name)
 
 
 
@@ -198,33 +196,33 @@ def reportMenu():
         os.system('cls') 
 
 
-def test(rep_name):
+def report(rep_name):
   """
   =======================================================================
-  Function:       
-  Purpose:        
-  Parameter(s):   
-  Return:         
+  Function:       report(rep_name):
+  Purpose:        gather data to generate report
+  Parameter(s):   rep_name
+  Return:         report
   =======================================================================
-  """
-  q  = fim1.rq2(1,rep_name)
-  q2 = fim1.rq3(1,rep_name)
-  q3 = fim1.rq4(1,rep_name)
-  q4 = fim1.rq5(1,rep_name)
-  
-  cursor.execute(q)
+  """  
+  # retrieve report query drom db
+  # -----------------------------
+  val = "query"
+  cursor.execute(fim1.rq2(1, val, rep_name))
   row = cursor.fetchone()
   for row in cursor:
       row = cursor.fetchone()
       row = str(row)    
-  
   rep_query = row
   x = str(rep_query)
   x= x.strip("()")
   x = x.strip("'")
   x = x.rstrip("',")
-  
-  cursor.execute(q3)
+ 
+  # retrieve report description drom db
+  # ------------------------------------  
+  val = "description"
+  cursor.execute(fim1.rq2(1,val, rep_name))
   row = cursor.fetchone()
   for row in cursor:
       row = cursor.fetchone()
@@ -232,7 +230,11 @@ def test(rep_name):
   name = str(row)
   name = name.strip("()")
   name = name.strip(",")
-  cursor.execute(q2)
+  
+  # retrieve report args_req drom db
+  # ---------------------------------
+  val = "args_req"
+  cursor.execute(fim1.rq2(1, val, rep_name))
   row = cursor.fetchone()
   for row in cursor:
       row = cursor.fetchone()
@@ -241,20 +243,23 @@ def test(rep_name):
   args_req = str(args_req)
   args_req = args_req.strip("()")
   args_req = args_req.strip(",")
-
-  cursor.execute(q4)
+  
+  # retrieve report arguements drom db
+  # -----------------------------------
+  val = "args"
+  cursor.execute(fim1.rq2(1, val, rep_name))
   row = cursor.fetchone()
   for row in cursor:
       row = cursor.fetchone()
       row = str(row)    
   args = row
-
+  
+  # how to proceed if arguements are required
+  # -----------------------------------------
   if args_req == "1":
     args = str(args)
     args = args.strip("'")
     args = args.strip("()")
-    print(args)
-    print(type(args))
 
     arg_list = args.split(",")
     
@@ -271,11 +276,11 @@ def test(rep_name):
 
     count = 0
     para = ("a" + str(count))
-    print("para " + para)
     count = count + 1
     para = ("a" + str(count))
-    print("para " + para)
-
+    
+    # format report name
+    # -------------------
     rep_na = row
     y = str(rep_na)
     y= y.strip("()")
@@ -283,25 +288,15 @@ def test(rep_name):
     y = y.rstrip("',")
 
     defin = fim1.rep2(clis)
-    print("defin: " + defin)
 
     rep = eval(defin)
     
-    print("value list length " + str(clis))
-    print("value list :" + str(avalue_list))
-    print(rep)
-    print("are args req: " + args_req)
-    print("args: " + y)
-    print("rep query passed to function: " + str(rep))
-    print("rep name: " + name)
-    print("rep no: " + rep_name)
     report_temp(name, rep, rep_name)
   
+  # how to proceed if arguements are NOT required
+  # ----------------------------------------------
   elif args_req == "0":
     report_temp(name, x, rep_name)
-    print("name: " + name)
-    print("number: " + rep_name)
-    print(x)
    
 def report_temp(rep_name, rep_query, rep_no):
   """
