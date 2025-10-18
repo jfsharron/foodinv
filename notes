@@ -1,0 +1,36 @@
+global code_no
+
+    # get intial code_no
+    # -------------------
+    mysql_select_query = ("SELECT value FROM xcounter WHERE counter_id = 1")
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query) 
+    code_no = cursor.fetchone()
+    code_no = str(code_no)
+    code_no = code_no.strip(",()'")
+    global init_code_no
+    init_code_no = code_no
+
+    # type selection
+    # ---------------  
+    mysql_select_query = ("SELECT type FROM type")
+
+    cursor = CONNECTION.cursor(buffered = True)
+    cursor.execute(mysql_select_query)    
+    rows = cursor.fetchall()
+    for row in rows:
+        row = str(row)
+        row = row.strip(",()'")
+        type_list.append(row)
+
+    print('')
+    questions = [
+      inquirer.List('ptype',
+                    message="What is the type?",
+                    choices=type_list,
+                    ),
+    ]
+    answers = inquirer.prompt(questions)
+    global ptype 
+    ptype = str(answers["ptype"])
+    ptype = ptype.strip(",()'")

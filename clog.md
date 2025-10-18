@@ -17,7 +17,16 @@
 
 
 
-<u>in progress</u>
+<u>03/24/2025 Commit 635d579</u>
 
 * need to DROP testrep table
 * created fim1 module to (dry) store queries
+* cleaned report coding from last commit
+* removed test table and added report table
+* corrected code and databeases bugs created during new report implamentation
+
+<u>in progress</u>
+
+* add function to slect report from list
+* add all records, instock report
+* select * from inv where discard=0 order by type, sub_type, date_packaged;

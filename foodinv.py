@@ -47,13 +47,24 @@ from copy import copy
 import fim1
 import fibo
 import re
+import mcnx
 
 # ==============================================================================
 # establish database connection
 # ==============================================================================
 
+
+# ==============================================================================
+# test string for external module
+
+
+# CONNECTION = mcnx.cnx('foodinv')
+
+# ==============================================================================
+
+
 XUSER       = 'jfsharron'
-XWORD       = 'marie151414'
+XWORD       = 'marie340115'
 HOST        = '192.168.2.107'
 DATABASE    = 'foodinv'
 
@@ -186,7 +197,34 @@ def reportMenu():
 
         elif menuOption == '2':
             rep_name = input("Enter report name: ")
-            report(rep_name)
+            if rep_name == 'b' or rep_name == 'B':
+              choices_table = []
+              cursor = CONNECTION.cursor(buffered = True)
+              cursor.execute(fim1.rq3(1, "name, description, args", "report"))
+              #cursor.execute(fim1.rq3(1, "name", "report"))    
+              rows = cursor.fetchall()
+              for row in rows:
+                  row = str(row)
+                  row = row.strip(",()'")
+                  choices_table.append(row)
+              questions = [
+                   inquirer.List('rep_name',
+                           message = "Enter report name: ",
+                           choices = choices_table,
+                           ),                    
+              ]
+              answers = inquirer.prompt(questions)
+              #print(type(answers))
+              anw2 = (answers["rep_name"][:5])
+              #print(anw2)
+              report(anw2)
+
+
+
+
+
+            else:
+                report(rep_name)
 
 
 

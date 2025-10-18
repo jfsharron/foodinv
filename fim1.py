@@ -39,6 +39,20 @@ def rq2(para, val, rep_name):
   if para == 1:
     return("SELECT " + val + " FROM report WHERE name = " + rep_name)
   
+def rq3(para, val, table):
+  """
+  =======================================================================
+  Function:     rq3(para, val, table)    
+  Purpose:      query to return one field from one table    
+  Parameter(s): para  - control variable
+                val   - field to return
+                table - table to query                 
+  Return:       return("SELECT " + val + " FROM " + table)
+  ======================================================================="    
+  """
+  if para == 1:
+    return("SELECT " + val + " FROM " + table)
+  
 
 
 # ==============================================================================
@@ -49,7 +63,7 @@ def rep2(clis):
     """
     =======================================================================
     Function:     rep2(para)
-    Purpose:      format arguement list sor reports
+    Purpose:      format arguement list for reports
     Parameter(s): para - the number of arguements being passed
     Return:       formated string to print arguements
     =======================================================================

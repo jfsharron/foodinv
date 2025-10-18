@@ -87,6 +87,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
 INSERT INTO xcounter(value) VALUES (2230);
+
 ----01/16/2022 modify table type to include code prefix (moved to changeset 6)
 ALTER TABLE type ADD COLUMN type_prefix char(2) AFTER type;
 
@@ -473,3 +474,63 @@ WHERE report_id = 3
 --03/24/2025 correct error in changeset 42 and 46 (incorrect description)
 UPDATE report SET description = 'Filtered - type, discard status, sub_type, pieces'
 WHERE report_id = 3
+
+--changeset jfs:49
+--04/18/2025 add instock, discard = 0 report
+INSERT INTO report (name, description, query, date_create, date_mod)
+VALUES (
+    '22222',
+    'All Records - Filtered, In-Stock',
+    'SELECT * FROM inv WHERE discard = 0',
+    '2025-04-18',
+    '2025-04-18')
+
+--changeset jfs:50
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET notes = ''
+WHERE report_id = 4
+
+--changeset jfs:51
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET creator = ''
+WHERE report_id = 4
+
+
+--changeset jfs:52
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET args_req = 0
+WHERE report_id = 4
+
+--changeset jfs:53
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET args = ''
+WHERE report_id = 4
+
+--changeset jfs:54
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET query = 'SELECT * FROM inv WHERE discard=0 ORDER by 
+                           type, sub_type, date_packaged'
+WHERE report_id = 4
+
+--changeset jfs:55
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET query = 'SELECT * FROM inv WHERE discard=0 ORDER by \
+                           type, sub_type, date_packaged'
+WHERE report_id = 4
+
+--changeset jfs:56
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET query = 'SELECT * FROM inv WHERE discard=0 ORDER BY type, 
+                           sub_type, date_packaged'
+WHERE report_id = 4
+
+--changeset jfs:57
+--03/24/2025 correct errors changeset jfs:49
+UPDATE report SET query = 'SELECT * FROM inv WHERE discard=0 ORDER BY type, ' 
+                          'sub_type, date_packaged'
+WHERE report_id = 4
+
+--changeset jfs:58
+--10/18/2025 add gizzrd and heart to chicken_sub table
+INSERT INTO chicken_sub(type) VALUES ('gizzard');
+INSERT INTO chicken_sub(type) VALUES ('heart');
